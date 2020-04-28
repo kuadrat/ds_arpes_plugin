@@ -4,11 +4,19 @@ import numpy as np
 from arpys import dl, pp
 from data_slicer import plugin
 
+class DatasetError(Exception) :
+    """ Error raised when the type of data found does not conform to our 
+    expectations.
+    """
+    pass
 
 class ARPES_Plugin(plugin.Plugin) :
     """ A plugin which connects the analysis functionalities of the `aprys` 
     module with PIT.
     """
+
+    _message = 'No ARPES data has been found. Load data with `load_data()`.'
+
     def __init__(self, *args, **kwargs) :
         super().__init__(*args, **kwargs)
         self.name = 'ARPES plugin'
@@ -30,6 +38,11 @@ class ARPES_Plugin(plugin.Plugin) :
         self.data_handler.prepare_data(D.data, [D.zscale, D.yscale, D.xscale])
 
         return D
+
+    def _check_for_arpes_data(self) :
+        """ Check if ARPES data has been loaded or raise an exception. """
+        if not hasattr(self, 'D') :
+            raise DatasetError(self._message)
 
     def a2k(self, alpha_axis, beta_axis=None, dalpha=0, dbeta=0, 
             orientation='horizontal', work_func=4, units=0) :
@@ -72,9 +85,11 @@ class ARPES_Plugin(plugin.Plugin) :
             direction in units of inverse Angstrom.
         ==  ====================================================================
         """
+        self._check_for_arpes_data()
+
         # Fetch correct axes
         axes = self.data_handler.original_axes
-        i = self.data_handler.roll_state
+        i = self.data_handler._roll_state
         axes = np.roll(axes, -i)
         alpha = axes[alpha_axis]
         if beta_axis is not None :
