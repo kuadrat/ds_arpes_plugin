@@ -16,6 +16,7 @@ class ARPES_Plugin(plugin.Plugin) :
     """
 
     _message = 'No ARPES data has been found. Load data with `load_data()`.'
+    filename = '<missing filename>'
 
     def __init__(self, *args, **kwargs) :
         super().__init__(*args, **kwargs)
@@ -36,6 +37,8 @@ class ARPES_Plugin(plugin.Plugin) :
 
         # Set the loaded data in PIT
         self.data_handler.prepare_data(D.data, [D.zscale, D.yscale, D.xscale])
+
+        self.filename = filename
 
         return D
 
@@ -123,5 +126,54 @@ class ARPES_Plugin(plugin.Plugin) :
 
         return KX, KY
 
+    def main_plot_normalize_per_segment(self, dim=0, min=False) :
+        """ Apply :func: `normalize_per_segment 
+        <arpys.postprocessing.normalize_per_segment>` to the data in the 
+        main_plot and visualize the result. 
 
+        :Note:
+        This result is not stored, does not affect other plots (like cut_plot 
+        and the x- and y-plots) and is lost the next time the main_plot is 
+        updated by any means.
+        To create a more persisting result, see :func: `normalize_per_segment 
+        <ds_arpes_plugin.ARPES_Plugin.normalize_per_segment>`
+        """
+        data = self.main_window.main_plot.image_data
+        norm_data = pp.normalize_per_segment(data, dim=dim)
+        self.main_window.set_image(norm_data, emit=False)
+
+    def cut_plot_normalize_per_segment(self, dim=0, min=False) :
+        """ Apply :func: `normalize_per_segment 
+        <arpys.postprocessing.normalize_per_segment>` to the data in the 
+        cut_plot and visualize the result. 
+
+        :Note:
+        This result is not stored, does not affect other plots (like cut_plot 
+        and the x- and y-plots) and is lost the next time the cut_plot is 
+        updated by any means.
+        To create a more persisting result, see :func: `normalize_per_segment 
+        <ds_arpes_plugin.ARPES_Plugin.normalize_per_segment>`
+        """
+        data = self.main_window.cut_plot.image_data
+        norm_data = pp.normalize_per_segment(data, dim=dim)
+        self.main_window.cut_plot.set_image(norm_data, 
+                                            lut=self.main_window.lut) 
+
+    def normalize_per_segment(self, dim=0, min=False) :
+        """ Apply :func: `normalize_per_segment 
+        <arpys.postprocessing.normalize_per_segment>` to every slice along z.
+
+        :Note:
+        The result of this operation is stored, i.e. the dataset is updated.
+        If you just want to have a quick look at what this operation might 
+        look like without applying it to the whole dataset, confer :func:
+        `main_plot_normalize_per_segment 
+        <ds_arpes_plugin.ARPES_Plugin.main_plot_normalize_per_segment>` or
+        :func: `cut_plot_normalize_per_segment 
+        <ds_arpes_plugin.ARPES_Plugin.cut_plot_normalize_per_segment>`
+        """
+        data = self.data_handler.get_data()
+        for z in data.shape[-1] :
+            pp.normalize_per_segment(data[:,:,z], dim=dim)
+        self.data_handler.set_data(data)
 
