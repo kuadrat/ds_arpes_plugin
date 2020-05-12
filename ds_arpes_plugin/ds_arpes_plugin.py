@@ -48,7 +48,7 @@ class ARPES_Plugin(plugin.Plugin) :
             raise DatasetError(self._message)
 
     def a2k(self, alpha_axis, beta_axis=None, dalpha=0, dbeta=0, 
-            orientation='horizontal', work_func=4, units=0) :
+            orientation='horizontal', work_func=4, units=0, hv=None) :
         """ Convert the axes from angles to k-space. 
         This updates the selected axes in the `pit.axes` and makes the change 
         visible in the main plot.
@@ -100,8 +100,10 @@ class ARPES_Plugin(plugin.Plugin) :
         else :
             beta = np.array([0])
 
+        if hv is None : hv = self.D.hv
+
         # Convert angles to k-space
-        KX, KY = pp.angle_to_k(alpha, beta, self.D.hv, dalpha=dalpha, dbeta=dbeta, 
+        KX, KY = pp.angle_to_k(alpha, beta, hv, dalpha=dalpha, dbeta=dbeta, 
                                orientation=orientation, work_func=work_func)
         
         if units!=0 :
