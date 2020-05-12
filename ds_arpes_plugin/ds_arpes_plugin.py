@@ -2,7 +2,7 @@ import argparse
 
 import numpy as np
 from arpys import dl, pp
-from data_slicer import plugin
+from data_slicer import cmaps, plugin
 
 class DatasetError(Exception) :
     """ Error raised when the type of data found does not conform to our 
@@ -176,4 +176,45 @@ class ARPES_Plugin(plugin.Plugin) :
         for z in data.shape[-1] :
             pp.normalize_per_segment(data[:,:,z], dim=dim)
         self.data_handler.set_data(data)
+
+    def plot_all_slices(self, dim=2, zs=None, labels='default', gamma=None, 
+                        vmax=None, cmap=None, max_ppf=16, max_nfigs=2) :
+        """ Wrapper for :func: `plot_cuts <arpys.postprocessing.plot_cuts>`.
+        Plot all (or only the ones specified by `zs`) slices along dimension 
+        `dim` on separate suplots onto matplotlib figures.
+
+        *Parameters*
+        =========  ============================================================
+        dim        int; one of (0,1,2). Dimension along which to take the cuts.
+        zs         1D np.array; selection of indices along dimension `dim`. Only 
+                   the given indices will be plotted.
+        labels     1D array/list of length z. Optional labels to assign to the 
+                   different cuts. By default the values of the respective axis
+                   are used. Set to *None* to suppress labels.
+        cmap       str; name of the matplotlib colormap to use.
+        vmax       float; 0 < vmax <= 1; max value for colormap normalization.
+        gamma      float; colormap PowerNorm normalization parameter.
+        max_ppf    int; maximum number of *p*lots *p*er *f*igure.
+        max_nfigs  int; maximum number of figures that are created. If more would 
+                   be necessary to display all plots, a warning is issued and 
+                   only every N'th plot is created, where N is chosen such that 
+                   the whole 'range' of plots is represented on the figures. 
+        =========  ============================================================
+        """
+        data = self.data_handler.get_data()
+        if labels == 'default' :
+            # Use the values of the respective axis as default labels
+            labels = self.data_handler.axes[dim]
+
+        # The default values for the colormap are taken from the main_window 
+        # settings
+        if gamma is None : gamma = self.main_window.gamma
+        if vmax is None : vmax = self.main_window.vmax
+        vmax = vmax*data.max()
+        if cmap is None : 
+            cmap = cmaps.convert_ds_to_matplotlib(self.main_window.cmap,
+                                                  self.main_window.cmap_name)
+        pp.plot_cuts(data, dim=dim, zs=zs, labels=labels, cmap=cmap, vmax=vmax, 
+                     gamma=gamma, max_ppf=max_ppf, max_nfigs=max_nfigs)
+
 
