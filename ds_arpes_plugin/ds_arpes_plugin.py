@@ -42,6 +42,24 @@ class ARPES_Plugin(plugin.Plugin) :
 
         return D
 
+    def load(self, filename) :
+        """ Load a set of ARPES data and bring it into PIT-friendly form. 
+        Also return the arpys data Namespace for inspection.
+
+        This is a convenience alias for :func: `load_data 
+        <ds_arpes_plugin.ARPES_Plugin.load_data`.
+        """
+        return self.load_data(filename)
+
+    def open(self, filename) :
+        """ Load a set of ARPES data and bring it into PIT-friendly form. 
+        Also return the arpys data Namespace for inspection.
+
+        This is a convenience alias for :func: `load_data 
+        <ds_arpes_plugin.ARPES_Plugin.load_data`.
+        """
+        return self.load_data(filename)
+
     def _check_for_arpes_data(self) :
         """ Check if ARPES data has been loaded or raise an exception. """
         if not hasattr(self, 'D') :
