@@ -178,6 +178,30 @@ class ARPES_Plugin(plugin.Plugin) :
 
         return KX, KY
 
+    def _get_corresponding_scale(self, dim=0) :
+        """ Return the axis in the *D* data object that corresponds to the 
+        one selected by *dim* from the ones displayed by PIT.
+        """
+        d_axes = np.roll(['z', 'y', 'x'], -self.data_handler._roll_state)
+        xyz = d_axes[dim]
+        scale = self.D.__getattribute__(xyz + 'scale')
+        return scale, xyz
+
+    def shift_axis(self, shift, dim=0, store=True) :
+        """ Apply a linear *shift* to the axis along *dim*, both on PIT's 
+        data and in the *D* data object.
+        """
+        if store :
+            # This operation also updates the correct array in self.D, since 
+            # they are effectively the same array.
+            self.data_handler.axes[dim] += shift
+        else :
+            new_axis = self.data_handler.axes[dim] + shift
+            self.data_handler.axes[dim] = new_axis
+
+        # Make the result visible
+        self.main_window.set_axes()
+
     def main_plot_normalize_per_segment(self, dim=0, min=False) :
         """ Apply :func: `normalize_per_segment 
         <arpys.postprocessing.normalize_per_segment>` to the data in the 
