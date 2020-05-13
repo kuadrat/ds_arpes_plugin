@@ -60,19 +60,41 @@ class ARPES_Plugin(plugin.Plugin) :
         """
         return self.load_data(filename)
 
+    def store(self, filename, force=False) :
+        """ Store the data Namespace :attr: `D <ds_arpes_plugin.ARPES_Plugin.D>`
+        in a pickle file *filename*. 
+        This can severely reduce loading times for certain filetypes.
+        """
+        self._check_for_arpes_data()
+        dl.dump(self.D, filename, force)
+
+    def dump(self, filename, force=False) :
+        """ Store the data Namespace :attr: `D <ds_arpes_plugin.ARPES_Plugin.D>`
+        in a pickle file *filename*. 
+        This can severely reduce loading times for certain filetypes.
+        
+        This is a convenience alias for :func: `store 
+        <ds_arpes_plugin.ARPES_Plugin.store>`.
+        """
+        self.store(filename, force)
+
     def _check_for_arpes_data(self) :
         """ Check if ARPES data has been loaded or raise an exception. """
         if not hasattr(self, 'D') :
             raise DatasetError(self._message)
 
     def a2k(self, alpha_axis, beta_axis=None, dalpha=0, dbeta=0, 
-            orientation='horizontal', work_func=4, units=0, hv=None) :
+            orientation='horizontal', work_func=4, units=0, hv=None, 
+            store=True) :
         """ Convert the axes from angles to k-space. 
         This updates the selected axes in the `pit.axes` and makes the change 
         visible in the main plot.
         Notice that there will be no error message or anything if you happen 
         to select nonsensical axes for *alpha_axis* and *beta_axis*, so 
         check carefully if your result makes sense.
+        The calculated KX and KY meshes (in the specified units) are stored 
+        in self.D, so the result can be retained when storing the data with 
+        :func: `store <ds_arpes_plugin.ARPES_Plugin.store>`.
         
         *Parameters*
         ===========  ===========================================================
@@ -96,6 +118,11 @@ class ARPES_Plugin(plugin.Plugin) :
                      - any nonzero value corresponds to units of pi/*units*
                        (this is useful, e.g. to convert to units of 
                        pi/lattice_constant)
+        hv           float; used photon energy in eV. If not given, this will 
+                     use the value stored in self.D (which is accurate in 
+                     most cases, but not all, e.g. in photon-energy scans)
+        store        boolean; set to False to suppress storing the found KX and
+                     KY meshes directly in the data object *D*.
         ===========  ===========================================================
 
         *Returns*
@@ -123,10 +150,15 @@ class ARPES_Plugin(plugin.Plugin) :
         # Convert angles to k-space
         KX, KY = pp.angle_to_k(alpha, beta, hv, dalpha=dalpha, dbeta=dbeta, 
                                orientation=orientation, work_func=work_func)
-        
+
         if units!=0 :
             KX /= (np.pi/units)
             KY /= (np.pi/units)
+
+        # Store the K meshes
+        if store :
+            self.D.KX = KX
+            self.D.KY = KY
 
         # Update PIT
         new_alpha = KY[:,0]
