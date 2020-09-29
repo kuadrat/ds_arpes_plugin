@@ -8,7 +8,7 @@ with open("README.md", "r") as fh :
 
 setuptools.setup(
     name='ds-arpes-plugin',
-    version='0.0.1',
+    version='0.0.2',
     author='Kevin Kramer',
     author_email='kevin.kramer@uzh.ch',
     description='Plugin connecting data_slicer.pit and arpys.',
