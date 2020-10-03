@@ -46,8 +46,8 @@ class ARPES_Plugin(plugin.Plugin) :
         """ Load a set of ARPES data and bring it into PIT-friendly form. 
         Also return the arpys data Namespace for inspection.
 
-        This is a convenience alias for :func: `load_data 
-        <ds_arpes_plugin.ARPES_Plugin.load_data`.
+        This is a convenience alias for :func:`load_data 
+        <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.load_data>`.
         """
         return self.load_data(filename)
 
@@ -55,13 +55,14 @@ class ARPES_Plugin(plugin.Plugin) :
         """ Load a set of ARPES data and bring it into PIT-friendly form. 
         Also return the arpys data Namespace for inspection.
 
-        This is a convenience alias for :func: `load_data 
-        <ds_arpes_plugin.ARPES_Plugin.load_data`.
+        This is a convenience alias for :func:`load_data 
+        <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.load_data>`.
         """
         return self.load_data(filename)
 
     def store(self, filename, force=False) :
-        """ Store the data Namespace :attr: `D <ds_arpes_plugin.ARPES_Plugin.D>`
+        """ Store the data Namespace :attr:`D 
+        <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.D>`
         in a pickle file *filename*. 
         This can severely reduce loading times for certain filetypes.
         """
@@ -69,12 +70,13 @@ class ARPES_Plugin(plugin.Plugin) :
         dl.dump(self.D, filename, force)
 
     def dump(self, filename, force=False) :
-        """ Store the data Namespace :attr: `D <ds_arpes_plugin.ARPES_Plugin.D>`
+        """ Store the data Namespace :attr:`D 
+        <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.D>`
         in a pickle file *filename*. 
         This can severely reduce loading times for certain filetypes.
         
-        This is a convenience alias for :func: `store 
-        <ds_arpes_plugin.ARPES_Plugin.store>`.
+        This is a convenience alias for :func:`store 
+        <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.store>`.
         """
         self.store(filename, force)
 
@@ -94,9 +96,10 @@ class ARPES_Plugin(plugin.Plugin) :
         check carefully if your result makes sense.
         The calculated KX and KY meshes (in the specified units) are stored 
         in self.D, so the result can be retained when storing the data with 
-        :func: `store <ds_arpes_plugin.ARPES_Plugin.store>`.
+        :func:`store <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.store>`.
         
-        *Parameters*
+        **Parameters**
+
         ===========  ===========================================================
         alpha_axis   int; index of the axis containing the angles along the 
                      analyser slit. In PIT, 0 corresponds to the horizontal 
@@ -114,10 +117,10 @@ class ARPES_Plugin(plugin.Plugin) :
                      slit geometry (horizontal or vertical).
         work_func    float; work function in eV.
         units        float; toggle what units to use.
-                     - 0 corresponds to inverse Angstrom
+                     - 0 corresponds to inverse Angstrom;
                      - any nonzero value corresponds to units of pi/*units*
-                       (this is useful, e.g. to convert to units of 
-                       pi/lattice_constant)
+                     (this is useful, e.g. to convert to units of 
+                     pi/lattice_constant).
         hv           float; used photon energy in eV. If not given, this will 
                      use the value stored in self.D (which is accurate in 
                      most cases, but not all, e.g. in photon-energy scans)
@@ -125,7 +128,8 @@ class ARPES_Plugin(plugin.Plugin) :
                      KY meshes directly in the data object *D*.
         ===========  ===========================================================
 
-        *Returns*
+        **Returns**
+
         ==  ====================================================================
         KX  array of shape (nkx, nky); mesh of k values in parallel direction in 
             units of inverse Angstrom.
@@ -203,32 +207,35 @@ class ARPES_Plugin(plugin.Plugin) :
         self.main_window.set_axes()
 
     def main_plot_normalize_per_segment(self, dim=0, min=False) :
-        """ Apply :func: `normalize_per_segment 
+        """ Apply the arpys function :func:`normalize_per_segment 
         <arpys.postprocessing.normalize_per_segment>` to the data in the 
         main_plot and visualize the result. 
 
-        :Note:
-        This result is not stored, does not affect other plots (like cut_plot 
-        and the x- and y-plots) and is lost the next time the main_plot is 
-        updated by any means.
-        To create a more persisting result, see :func: `normalize_per_segment 
-        <ds_arpes_plugin.ARPES_Plugin.normalize_per_segment>`
+        .. Note::
+
+            This result is not stored, does not affect other plots (like 
+            cut_plot and the x- and y-plots) and is lost the next time the 
+            main_plot is updated by any means.
+            To create a more persisting result, see 
+            :func:`normalize_per_segment 
+            <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.normalize_per_segment>`
         """
         data = self.main_window.main_plot.image_data
         norm_data = pp.normalize_per_segment(data, dim=dim)
         self.main_window.set_image(norm_data, emit=False)
 
     def cut_plot_normalize_per_segment(self, dim=0, min=False) :
-        """ Apply :func: `normalize_per_segment 
+        """ Apply the arpys function :func:`normalize_per_segment 
         <arpys.postprocessing.normalize_per_segment>` to the data in the 
         cut_plot and visualize the result. 
 
-        :Note:
-        This result is not stored, does not affect other plots (like cut_plot 
-        and the x- and y-plots) and is lost the next time the cut_plot is 
-        updated by any means.
-        To create a more persisting result, see :func: `normalize_per_segment 
-        <ds_arpes_plugin.ARPES_Plugin.normalize_per_segment>`
+        .. Note::
+
+            This result is not stored, does not affect other plots (like 
+            cut_plot and the x- and y-plots) and is lost the next time the 
+            cut_plot is updated by any means.  To create a more persisting 
+            result, see :func:`normalize_per_segment 
+            <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.normalize_per_segment>`
         """
         data = self.main_window.cut_plot.image_data
         norm_data = pp.normalize_per_segment(data, dim=dim)
@@ -236,20 +243,44 @@ class ARPES_Plugin(plugin.Plugin) :
                                             lut=self.main_window.lut) 
 
     def normalize_per_segment(self, dim=0, min=False) :
-        """ Apply :func: `normalize_per_segment 
+        """ Apply the arpys function :func:`normalize_per_segment 
         <arpys.postprocessing.normalize_per_segment>` to every slice along z.
 
-        :Note:
-        The result of this operation is stored, i.e. the dataset is updated.
-        If you just want to have a quick look at what this operation might 
-        look like without applying it to the whole dataset, confer :func:
-        `main_plot_normalize_per_segment 
-        <ds_arpes_plugin.ARPES_Plugin.main_plot_normalize_per_segment>` or
-        :func: `cut_plot_normalize_per_segment 
-        <ds_arpes_plugin.ARPES_Plugin.cut_plot_normalize_per_segment>`
+        .. Note::
+
+            The result of this operation is stored, i.e. the dataset is 
+            updated.  If you just want to have a quick look at what this 
+            operation might look like without applying it to the whole 
+            dataset, confer :func:`main_plot_normalize_per_segment 
+            <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.main_plot_normalize_per_segment>` 
+            or :func:`cut_plot_normalize_per_segment 
+            <ds_arpes_plugin.ds_arpes_plugin.ARPES_Plugin.cut_plot_normalize_per_segment>`
         """
         data = self.data_handler.get_data()
         for z in data.shape[-1] :
             pp.normalize_per_segment(data[:,:,z], dim=dim)
         self.data_handler.set_data(data)
+
+    def apply_model(self, model=lambda x,y : np.cos(x**2) + np.cos(y**2), 
+                    eps=0.1) :
+        """ Work in progress. """
+#        input1 = self.data_handler.axes[0]
+#        input2 = self.data_handler.axes[1]
+#        X, Y = np.meshgrid(input1, input2)
+        xaxis = self.data_handler.axes[0]
+        yaxis = self.data_handler.axes[1]
+        x = np.linspace(xaxis.min(), xaxis.max(), 100)
+        y = np.linspace(yaxis.min(), yaxis.max(), 100)
+        X, Y = np.meshgrid(x, y)
+        model_data = model(X, Y)
+        z_ind = self.data_handler.z.get_value()
+        z = self.data_handler.axes[2][z_ind]
+        mask = np.where(np.abs(model_data - z) < eps)
+        xs = X[mask]
+        ys = Y[mask]
+
+        self.main_window.main_plot.plotItem.plot(xs, ys, symbol='o', 
+                                                 symbolSize=5)
+
+        return model_data, X, Y, mask
 
